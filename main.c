@@ -4,7 +4,7 @@
 
 struct command_line {
     char operation[6];
-    int *regs[3];
+    int regs[3];
 }typedef command_line;
 
 void parse(FILE *input, int *reg, int *memo);
@@ -69,6 +69,7 @@ void parse(FILE *input, int *reg, int *memo) {
     while (!feof(input)) {
         char *in_string = calloc(32, sizeof(char));
         fgets(in_string, 32, input);
+        PC ++;
         execute_command(in_string, reg, memo);
 //        char *pch = strtok(in_string, " ");
 //        while (pch != NULL) {
@@ -82,12 +83,17 @@ void parse(FILE *input, int *reg, int *memo) {
 
 void execute_command(char *in_string, int *reg, int *memo) {
     command_line command;
-    char *pch = strtok(in_string, " ");
-    char *operation = pch;
-
-    while (pch != NULL) {
-        printf("%s ", pch);
-        pch = strtok(NULL, " ");
+    char *pch = strtok(in_string, " ,");
+    strcpy(command.operation, pch);
+    printf("operation: %s\n", command.operation);
+    printf("regs: ");
+    int i = 0;
+    while (pch != NULL && i < 3) {
+      //  printf("%s\n",pch);
+        pch = strtok(NULL, " ,");
+        command.regs[i] = atoi(pch);
+        printf("%d ", command.regs[i]);
+        i++;
     }
     printf("\n");
 }
