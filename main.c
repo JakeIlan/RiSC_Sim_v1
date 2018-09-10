@@ -84,11 +84,11 @@ void execute_command(char *in_string, int *reg, int *memo, int pc) {
         command.regs[i] = atoi(pch);
         i++;
     }
-    printf("############\n");
+    printf("--------------------------\n");
     printf("Position: %d\n", command.position);
     printf("Operation: %s\n", command.operation);
     printf("Regs: %d %d %d\n", command.regs[0], command.regs[1], command.regs[2]);
-    printf("############\n");
+    printf("--------------------------\n");
 }
 
 void parse_debug(FILE *input, int *reg, int *memo) {
@@ -108,8 +108,11 @@ void parse_debug(FILE *input, int *reg, int *memo) {
             fgets(in_string, 32, input);
             execute_command(in_string, reg, memo, PC);
             PC++;
+            for (int i = 0; i < 8; ++i) {
+                printf("%s%d%s%d\n", "r", i, " = ", reg[i]);
+            }
         } else {
-            printf("unknown command, please try again\n");
+            printf("unknown command or EOF, please try again\n");
         }
     }
 
