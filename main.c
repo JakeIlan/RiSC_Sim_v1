@@ -89,6 +89,16 @@ void execute_command(char *in_string, int *reg, int *memo, int pc) {
     printf("Operation: %s\n", command.operation);
     printf("Regs: %d %d %d\n", command.regs[0], command.regs[1], command.regs[2]);
     printf("--------------------------\n");
+
+    if (strcmp(command.operation, "add") == 0) {
+        reg[command.regs[0]] = reg[command.regs[1]] + reg[command.regs[2]];
+    } else if (strcmp(command.operation, "addi") == 0) {
+        reg[command.regs[0]] = reg[command.regs[1]] + command.regs[2];
+    } else if (strcmp(command.operation, "nand") == 0) {
+        reg[command.regs[0]] = reg[command.regs[1]] - reg[command.regs[2]];
+    } else {
+
+    }
 }
 
 void parse_debug(FILE *input, int *reg, int *memo) {
@@ -115,7 +125,6 @@ void parse_debug(FILE *input, int *reg, int *memo) {
             printf("unknown command or EOF, please try again\n");
         }
     }
-
 }
 
 
