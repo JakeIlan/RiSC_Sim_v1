@@ -5,13 +5,14 @@
 struct command_line {
     char operation[6];
     int regs[3];
+    int position;
 }typedef command_line;
 
 void parse(FILE *input, int *reg, int *memo);
 
 void parse_debug(FILE *input, int *reg, int *memo);
 
-void execute_command(char *in_string, int *reg, int *memo);
+void execute_command(char *in_string, int *reg, int *memo, int pc);
 
 int main() {
     int regs[8] = {0};
@@ -69,33 +70,31 @@ void parse(FILE *input, int *reg, int *memo) {
     while (!feof(input)) {
         char *in_string = calloc(32, sizeof(char));
         fgets(in_string, 32, input);
+        execute_command(in_string, reg, memo, PC);
         PC ++;
-        execute_command(in_string, reg, memo);
-//        char *pch = strtok(in_string, " ");
-//        while (pch != NULL) {
-//            printf("%s ", pch);
-//            pch = strtok(NULL, " ");
-//        }
-//        printf("\n");
     }
 
 }
 
-void execute_command(char *in_string, int *reg, int *memo) {
+void execute_command(char *in_string, int *reg, int *memo, int pc) {
     command_line command;
+    command.position = pc;
+    for (int j = 0; j < 3; ++j) command.regs[j] = 0;
+
     char *pch = strtok(in_string, " ,");
     strcpy(command.operation, pch);
-    printf("operation: %s\n", command.operation);
-    printf("regs: ");
+
     int i = 0;
     while (pch != NULL && i < 3) {
-      //  printf("%s\n",pch);
         pch = strtok(NULL, " ,");
         command.regs[i] = atoi(pch);
-        printf("%d ", command.regs[i]);
         i++;
     }
-    printf("\n");
+    printf("############\n");
+    printf("Position: %d\n", command.position);
+    printf("Operation: %s\n", command.operation);
+    printf("Regs: %d %d %d\n", command.regs[0], command.regs[1], command.regs[2]);
+    printf("############\n");
 }
 
 void parse_debug(FILE *input, int *reg, int *memo) {
