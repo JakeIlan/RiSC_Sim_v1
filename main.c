@@ -6,7 +6,7 @@ struct command_line {
     char operation[6];
     int regs[3];
     int position;
-}typedef command_line;
+} typedef command_line;
 
 void parse(FILE *input, int *reg, int *memo);
 
@@ -17,11 +17,6 @@ void execute_command(char *in_string, int *reg, int *memo, int pc);
 int main() {
     int regs[8] = {0};
     int memo[1024] = {0};
-
-
-//    for (int i = 0; i < 8; ++i) {
-//        printf("%s%d%s%d\n", "r", i, " = ", regs[i]);
-//    }
 
     char symbols[] = {"1234567890 #;"};
     char letters[] = {"AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz"};
@@ -40,18 +35,18 @@ int main() {
         printf("%s", "INPUT FILE ERROR");
         exit(100);
     } else {
-        printf("press 'd' to enter debug mode\n");
+        printf("Press 'd' to enter debug mode\n");
+        printf("or something else to run in normal mode.\n");
         scanf("%s", debug);
         if (strcmp(debug, "d") == 0) {
-            printf("running in a debug mode..\n");
+            printf("Running in a debug mode..\n");
             parse_debug(input, regs, memo);
         } else {
-            printf("running in normal mode..\n");
+            printf("Running in normal mode..\n");
             parse(input, regs, memo);
 
         }
     }
-
 
     fclose(input);
 
@@ -71,9 +66,8 @@ void parse(FILE *input, int *reg, int *memo) {
         char *in_string = calloc(32, sizeof(char));
         fgets(in_string, 32, input);
         execute_command(in_string, reg, memo, PC);
-        PC ++;
+        PC++;
     }
-
 }
 
 void execute_command(char *in_string, int *reg, int *memo, int pc) {
@@ -98,7 +92,27 @@ void execute_command(char *in_string, int *reg, int *memo, int pc) {
 }
 
 void parse_debug(FILE *input, int *reg, int *memo) {
-    printf("test");
+    char *step = calloc(1, sizeof(char));
+    int PC = 0;
+    printf("Program now is in debugging mode.\n");
+    printf("After each step all registers will be shown here\n");
+    while (1) {
+        printf("Press 'd' to take a single step.\n");
+        printf("Press 'x' to exit the program.\n");
+        scanf("%s", step);
+        if (strcmp(step, "x") == 0) {
+            printf("closing..\n");
+            exit(1);
+        } else if (strcmp(step, "d") == 0 && !feof(input)) {
+            char *in_string = calloc(32, sizeof(char));
+            fgets(in_string, 32, input);
+            execute_command(in_string, reg, memo, PC);
+            PC++;
+        } else {
+            printf("unknown command, please try again\n");
+        }
+    }
+
 }
 
 
