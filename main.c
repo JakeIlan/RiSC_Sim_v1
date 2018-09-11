@@ -14,6 +14,8 @@ void parse_debug(FILE *input, int *reg, int *memo);
 
 void execute_command(char *in_string, int *reg, int *memo, int pc);
 
+void pre_compile(FILE *input);
+
 int main() {
     int regs[8] = {0};
     int memo[1024] = {0};
@@ -51,9 +53,12 @@ int main() {
     fclose(input);
 
     output = fopen("..\\REGISTERS.txt", "w");
-    for (int i = 0; i < 8; ++i) {
+    for (int i = 0; i < 7; ++i) {
         fprintf(output, "%s%d%s%d\n", "r", i, " = ", regs[i]);
     }
+    fprintf(output, "%s%d%s%d", "r", 7, " = ", regs[7]);
+    fclose(output);
+    printf("Complete.");
     return 1;
 }
 
@@ -84,21 +89,54 @@ void execute_command(char *in_string, int *reg, int *memo, int pc) {
         command.regs[i] = atoi(pch);
         i++;
     }
-    printf("--------------------------\n");
-    printf("Position: %d\n", command.position);
-    printf("Operation: %s\n", command.operation);
-    printf("Regs: %d %d %d\n", command.regs[0], command.regs[1], command.regs[2]);
-    printf("--------------------------\n");
+
+    if ((command.regs[0] < 0 || command.regs[0] > 7 ||
+        command.regs[1] < 0 || command.regs[1] > 7) &&
+        strcmp(command.operation, "lui") != 0) {
+        printf("Input error:\n");
+        printf("Can't reach register at line %d\n", command.position);
+        printf("Registers most be in a range 0 - 7");
+        exit(102);
+    }
+//    printf("--------------------------\n");
+//    printf("Position: %d\n", command.position);
+//    printf("Operation: %s\n", command.operation);
+//    printf("Regs: %d %d %d\n", command.regs[0], command.regs[1], command.regs[2]);
+//    printf("--------------------------\n");
 
     if (strcmp(command.operation, "add") == 0) {
+        if (command.regs[2] < 0 || command.regs[2] > 7) {
+            printf("Input error:\n");
+            printf("Can't reach register at line %d\n", command.position);
+            printf("Registers most be in a range 0 - 7");
+            exit(102);
+        }
         reg[command.regs[0]] = reg[command.regs[1]] + reg[command.regs[2]];
     } else if (strcmp(command.operation, "addi") == 0) {
         reg[command.regs[0]] = reg[command.regs[1]] + command.regs[2];
     } else if (strcmp(command.operation, "nand") == 0) {
         reg[command.regs[0]] = reg[command.regs[1]] - reg[command.regs[2]];
-    } else {
+    } else if (strcmp(command.operation, "lui") == 0) {
 
+    } else if (strcmp(command.operation, "sw") == 0) {
+
+    } else if (strcmp(command.operation, "lw") == 0) {
+
+    } else if (strcmp(command.operation, "beq") == 0) {
+
+    } else if (strcmp(command.operation, "jalr") == 0) {
+
+    } else if (strcmp(command.operation, "halt") == 0) {
+        exit(1);
+    } else {
+        printf("Input error:\n");
+        printf("Unknown command in line %d\n", command.position);
+        exit(102);
     }
+}
+
+void pre_compile(FILE *input) {
+
 }
 
 void parse_debug(FILE *input, int *reg, int *memo) {
