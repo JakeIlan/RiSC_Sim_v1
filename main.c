@@ -14,15 +14,11 @@ void parse_debug(FILE *input, int *reg, int *memo);
 
 void execute_command(char *in_string, int *reg, int *memo, FILE *input);
 
-void jump_to(int pos, FILE *input);
+void branch_to(int pos, FILE *input);
 
 int main() {
     int regs[8] = {0};
     int memo[1024] = {0};
-
-    char symbols[] = {"1234567890 #;"};
-    char letters[] = {"AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz"};
-
 
     char ins[32];
     char *p;
@@ -61,15 +57,11 @@ int main() {
 }
 
 void parse(FILE *input, int *reg, int *memo) {
-    char symbols[] = {"1234567890 #;"};
-    char letters[] = {"AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz"};
+
     char *in_string = calloc(32, sizeof(char));
-
-
 
     while (!feof(input)) {
         fgets(in_string, 32, input);
-
         execute_command(in_string, reg, memo, input);
     }
 }
@@ -91,7 +83,6 @@ void execute_command(char *in_string, int *reg, int *memo, FILE *input) {
         command.regs[i] = atoi(pch);
         i++;
     }
-
     if ((command.regs[0] < 0 || command.regs[0] > 7 ||
         command.regs[1] < 0 || command.regs[1] > 7) &&
         strcmp(command.operation, "lui") != 0) {
@@ -100,11 +91,6 @@ void execute_command(char *in_string, int *reg, int *memo, FILE *input) {
         printf("Registers most be in a range 0 - 7");
         exit(102);
     }
-//    printf("--------------------------\n");
-//    printf("Position: %d\n", command.position);
-//    printf("Operation: %s\n", command.operation);
-//    printf("Regs: %d %d %d\n", command.regs[0], command.regs[1], command.regs[2]);
-//    printf("--------------------------\n");
 
     if (strcmp(command.operation, "add") == 0) {
         if (command.regs[2] < 0 || command.regs[2] > 7) {
@@ -116,38 +102,52 @@ void execute_command(char *in_string, int *reg, int *memo, FILE *input) {
         printf("performing ADD\n");
         reg[command.regs[0]] = reg[command.regs[1]] + reg[command.regs[2]];
         PC++;
-//        return pc++;
     } else if (strcmp(command.operation, "addi") == 0) {
         printf("performing ADDI\n");
         reg[command.regs[0]] = reg[command.regs[1]] + command.regs[2];
         PC++;
-//        return pc++;
+
     } else if (strcmp(command.operation, "nand") == 0) {
+        if (command.regs[2] < 0 || command.regs[2] > 7) {
+            printf("Input error:\n");
+            printf("Can't reach register at line %d\n", command.position);
+            printf("Registers most be in a range 0 - 7");
+            exit(102);
+        }
         reg[command.regs[0]] = reg[command.regs[1]] - reg[command.regs[2]];
-//        return pc++;
+        PC++;
+
     } else if (strcmp(command.operation, "lui") == 0) {
-//        return pc++;
+        if (command.regs[0] < 0 || command.regs[0] > 7) {
+            printf("Input error:\n");
+            printf("Can't reach register at line %d\n", command.position);
+            printf("Registers most be in a range 0 - 7");
+            exit(102);
+        }
+        reg[command.regs[0]] = (int)(command.regs[1] & 01111111111000000);
+        PC++;
 
     } else if (strcmp(command.operation, "sw") == 0) {
-//        return pc++;
-
+        memo[command.regs[1] + command.regs[2]] = reg[command.regs[0]];
+        PC++;
     } else if (strcmp(command.operation, "lw") == 0) {
-//        return pc++;
-
+        reg[command.regs[0]] = memo[command.regs[1] + command.regs[2]];
+        PC++;
     } else if (strcmp(command.operation, "beq") == 0) {
         printf("performing BEQ\n");
         if (reg[command.regs[0]] == reg[command.regs[1]]) {
-            jump_to(command.position + 1 + command.regs[2], input);
+            branch_to(command.position + 1 + command.regs[2], input);
             PC += 1 + command.regs[2];
             printf("jumping to %d\n", PC);
-//            return pc + 1 + command.regs[2];
+
         } else {
             printf("not jumping\n");
             PC++;
         }
-
     } else if (strcmp(command.operation, "jalr") == 0) {
-
+        branch_to(reg[command.regs[1]], input);
+        PC = reg[command.regs[1]];
+        reg[command.regs[0]] = PC + 1;
     } else if (strcmp(command.operation, "halt") == 0) {
         printf("Complete.");
         exit(1);
@@ -158,12 +158,11 @@ void execute_command(char *in_string, int *reg, int *memo, FILE *input) {
     }
 }
 
-void jump_to(int pos ,FILE *input) {
+void branch_to(int pos, FILE *input) {
     freopen("..\\input.txt", "r", input);
     char *in_string = calloc(32, sizeof(char));
 
     while (!feof(input) && pos != 0) {
-//        printf("now I'm at %d string of file\n", i);
         fgets(in_string, 32, input);
         pos--;
     }
