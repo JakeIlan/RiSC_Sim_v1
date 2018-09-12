@@ -60,11 +60,6 @@ void parse(FILE *input, int *reg, int *memo) {
 
     char *in_string = calloc(32, sizeof(char));
 
-    if (fgets(in_string, 32, input) != NULL) {
-        printf("Empty input file.\n");
-        exit(101);
-    }
-
     while (!feof(input)) {
         fgets(in_string, 32, input);
         execute_command(in_string, reg, memo, input);
@@ -80,6 +75,10 @@ void execute_command(char *in_string, int *reg, int *memo, FILE *input) {
     for (int j = 0; j < 3; ++j) command.regs[j] = 0;
 
     char *pch = strtok(in_string, " ,");
+    if (pch == NULL){
+        printf("Input is empty.");
+        exit(101);
+    }
     strcpy(command.operation, pch);
 
     int i = 0;
