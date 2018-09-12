@@ -60,6 +60,11 @@ void parse(FILE *input, int *reg, int *memo) {
 
     char *in_string = calloc(32, sizeof(char));
 
+    if (fgets(in_string, 32, input) != NULL) {
+        printf("Empty input file.\n");
+        exit(101);
+    }
+
     while (!feof(input)) {
         fgets(in_string, 32, input);
         execute_command(in_string, reg, memo, input);
@@ -156,6 +161,15 @@ void execute_command(char *in_string, int *reg, int *memo, FILE *input) {
         printf("Unknown command in line %d\n", command.position);
         exit(102);
     }
+
+    FILE *output;
+
+    output = fopen("..\\REGISTERS.txt", "w");
+    for (int j = 0; j < 7; ++j) {
+        fprintf(output, "%s%d%s%d\n", "r", j, " = ", reg[j]);
+    }
+    fprintf(output, "%s%d%s%d", "r", 7, " = ", reg[7]);
+    fclose(output);
 }
 
 void branch_to(int pos, FILE *input) {

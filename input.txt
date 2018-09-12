@@ -1,4 +1,0 @@
-addi 0,5,3
-addi 3,0,1
-addi 4,5,1
-jalr 6,4
