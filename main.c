@@ -137,6 +137,8 @@ void execute_command(char *in_string, int *reg, int *memo, FILE *input) {
     } else if (strcmp(command.operation, "lw") == 0) {
         reg[command.regs[0]] = memo[command.regs[1] + command.regs[2]];
         PC++;
+    } else if (strcmp(command.operation, "nop") == 0) {
+        PC++;
     } else if (strcmp(command.operation, "beq") == 0) {
         printf("performing BEQ\n");
         if (reg[command.regs[0]] == reg[command.regs[1]]) {
@@ -154,7 +156,7 @@ void execute_command(char *in_string, int *reg, int *memo, FILE *input) {
         reg[command.regs[0]] = PC + 1;
     } else if (strcmp(command.operation, "halt") == 0) {
         printf("Complete.");
-        exit(1);
+        exit(10);
     } else {
         printf("Input error:\n");
         printf("Unknown command in line %d\n", command.position);
