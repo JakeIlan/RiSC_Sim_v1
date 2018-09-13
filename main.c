@@ -67,9 +67,8 @@ void parse(FILE *input, int *reg, int *memo) {
 }
 
 void execute_command(char *in_string, int *reg, int *memo, FILE *input) {
-    static int PC = 0;
-    printf("PC = %d\n", PC);
-    printf("-----------\n");
+    static int PC = 1;
+
     command_line command;
     command.position = PC;
     for (int j = 0; j < 3; ++j) command.regs[j] = 0;
@@ -79,6 +78,8 @@ void execute_command(char *in_string, int *reg, int *memo, FILE *input) {
         printf("Input is empty.");
         exit(101);
     }
+    printf("PC = %d\n", PC);
+    printf("-----------\n");
     strcpy(command.operation, pch);
 
     int i = 0;
@@ -138,6 +139,9 @@ void execute_command(char *in_string, int *reg, int *memo, FILE *input) {
         reg[command.regs[0]] = memo[command.regs[1] + command.regs[2]];
         PC++;
     } else if (strcmp(command.operation, "nop") == 0) {
+        PC++;
+    } else if (strcmp(command.operation, "movi") == 0) {
+        reg[command.regs[0]] = command.regs[1];
         PC++;
     } else if (strcmp(command.operation, "beq") == 0) {
         printf("performing BEQ\n");
